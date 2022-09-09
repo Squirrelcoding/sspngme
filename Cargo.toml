@@ -1,0 +1,14 @@
+[package]
+name = "pngme"
+author = "Squirrelcoding"
+version = "0.1.0"
+edition = "2021"
+homepage = "https://softsquirrel.net/"
+about = "Hide messages in PNG files"
+
+[dependencies]
+clap = { version = "3.2.17", features = ["derive"] }
+colored = "2.0.0"
+crc = "3.0.0"
+structopt = "0.3.26"
+thiserror = "1.0.32"
