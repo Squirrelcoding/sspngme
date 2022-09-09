@@ -64,7 +64,7 @@ impl Chunk {
     }
 
     pub fn data_as_string(&self) -> Result<String, Error> {
-        let string = String::from_utf8(self.data.iter().copied().collect())?;
+        let string = String::from_utf8(self.data.to_vec())?;
 
         Ok(string)
     }

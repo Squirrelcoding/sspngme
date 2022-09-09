@@ -1,10 +1,9 @@
-pub mod args {
     use colored::Colorize;
 
     use crate::{chunk::Chunk, chunk_type::ChunkType, png::Png, Error};
     use std::{
         fs::OpenOptions,
-        io::{Read, Seek, SeekFrom, Write},
+        io::{Read, Seek, SeekFrom, Write}, str::FromStr,
     };
 
     /// Encode a payload to a file
@@ -59,26 +58,12 @@ pub mod args {
                         .red()
                         .bold()
                 );
-                return Err(error.into());
+                return Err(error);
             }
         };
 
-        // Buffer for the chunk type and then try to read to it
-        let mut chunk_type_buf: [u8; 4] = [0; 4];
-
-        if let Err(error) = chunk_type.as_bytes().read(&mut chunk_type_buf) {
-            println!(
-                "{} '{}'",
-                "An internal error has occured, please try again."
-                    .red()
-                    .bold(),
-                file_name.bold()
-            );
-            return Err(error.into());
-        };
-
-        // Try to create a ChunkType struct
-        let chunk_type = match ChunkType::try_from(chunk_type_buf) {
+        // Try to create a ChunkType struct from the chunk type
+        let chunk_type = match ChunkType::from_str(chunk_type) {
             Ok(chunk_type) => chunk_type,
             Err(error) => {
                 println!(
@@ -87,7 +72,7 @@ pub mod args {
                         .red()
                         .bold()
                 );
-                return Err(error.into());
+                return Err(error);
             }
         };
 
@@ -145,7 +130,7 @@ pub mod args {
                         .red()
                         .bold()
                 );
-                return Err(error.into());
+                return Err(error);
             }
         };
 
@@ -158,7 +143,7 @@ pub mod args {
                 );
 
                 print!("{} ", "Message:".white().bold());
-                print!("{}\n", chunk.data_as_string()?);
+                println!("{}", chunk.data_as_string()?);
             }
             None => {
                 println!(
@@ -213,7 +198,7 @@ pub mod args {
                 chunk_type.white().bold(),
                 "was not found".white().bold()
             );
-            return Err(error.into());
+            return Err(error);
         }
 
         println!("{}", "Removed chunk from file successfully".green().bold());
@@ -231,4 +216,3 @@ pub mod args {
 
         Ok(())
     }
-}

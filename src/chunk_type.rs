@@ -38,9 +38,12 @@ impl TryFrom<[u8; 4]> for ChunkType {
     type Error = Error;
 
     fn try_from(value: [u8; 4]) -> Result<Self, Self::Error> {
-        // Check if valid ASCII
         if !value.is_ascii() {
             return Err(ChunkTypeError::InvalidASCII.into());
+        }
+        
+        if value[2].is_ascii_digit() {
+            return Err(ChunkTypeError::InvalidChar.into());
         }
 
         Ok(Self::new(value))
@@ -57,14 +60,18 @@ impl FromStr for ChunkType {
             return Err(ChunkTypeError::InvalidLength.into());
         }
         
-        if s.chars().nth(2).unwrap().is_ascii_digit() {
+        let third_char = s.chars().nth(2).unwrap();
+
+        if third_char.is_ascii_digit() {
             return Err(ChunkTypeError::InvalidChar.into());
         }
 
 
         let mut buf: [u8; 4] = [0; 4];
 
-        s.as_bytes().read(&mut buf)?;
+        if s.as_bytes().read(&mut buf).is_err() {
+            return Err(ChunkTypeError::InvalidLength.into());
+        }
 
         Ok(Self::new(buf))
     }

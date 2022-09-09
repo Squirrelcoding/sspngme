@@ -11,14 +11,7 @@ impl Png {
     const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
     pub fn from_chunks(chunks: Vec<Chunk>) -> Png {
-        let mut data = Vec::new();
-
-        // data.append(&mut vec![137, 80, 78, 71, 13, 10, 26, 10]);
-
-        for chunk in chunks {
-            data.push(chunk);
-        }
-        Png { data }
+        Png { data: chunks }
     }
 
     pub fn append_chunk(&mut self, chunk: Chunk) {
@@ -26,6 +19,9 @@ impl Png {
     }
 
     pub fn remove_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Error> {
+
+
+
         for (index, chunk) in self.data.iter().enumerate() {
             if chunk.chunk_type().to_string() == chunk_type {
                 // println!("{}\t{}", chunk.chunk_type().to_string(), chunk_type);
@@ -39,7 +35,7 @@ impl Png {
             }
         }
 
-        return Err(PngError::NonExistentChunk.into());
+        Err(PngError::NonExistentChunk.into())
     }
 
     pub fn header(&self) -> &[u8; 8] {
@@ -62,13 +58,17 @@ impl Png {
 
     pub fn as_bytes(&self) -> Vec<u8> {
         let mut data: Vec<u8> = vec![137, 80, 78, 71, 13, 10, 26, 10];
+        
 
         for chunk in &self.data {
             data.extend_from_slice(&chunk.length.to_be_bytes());
             data.extend_from_slice(&chunk.chunk_type.chunk_type);
+
             for byte in chunk.data().iter() {
                 data.push(*byte);
             }
+
+
             data.extend_from_slice(&chunk.crc.to_be_bytes());
         }
 
